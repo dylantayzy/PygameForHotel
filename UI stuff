@@ -1,0 +1,99 @@
+import os
+import pygame as py
+import pandas as pd
+import numpy as np
+
+# Data Processing
+df = pd.read_csv("C:\\Users\\Dylan\\Downloads\\Hotel Data sample.csv")
+df = df.set_index('Hotel name')
+
+# Calculating Distances
+
+# Sorting
+
+# UI
+os.environ['SDL_VIDEO_CENTERED'] = '1'
+py.init()
+info = py.display.Info()
+screen_w, screen_h = info.current_w, info.current_h
+screen = py.display.set_mode((screen_w, screen_h - 60))
+py.display.set_caption("Hotel Recommendations")
+white = (255, 255, 255)
+black = (0, 0, 0)
+blue = (0, 0, 255)
+red = (255, 0, 0)
+maroon = (128, 0, 0)
+green = (0, 255, 110)
+light_green = (26, 219, 58)
+light_blue = (66, 179, 244)
+yellow = (191, 255, 0)
+font = py.font.Font(None, 36)
+
+
+class Button:
+    def __init__(self, x_pos, y_pos, width, height, text_input, base_colour):
+        self.x_pos = x_pos
+        self.y_pos = y_pos
+        self.width = width
+        self.height = height
+        self.text_input = text_input
+        self.text = font.render(text_input, True, white)
+        self.text_rect = self.text.get_rect(center=(x_pos + width / 2, y_pos + height / 2))
+        self.base_colour = base_colour
+
+    # Generating the text and the rectangle for the button
+    def update(self):
+        py.draw.rect(screen, self.base_colour, (self.x_pos, self.y_pos, self.width, self.height))
+        screen.blit(self.text, self.text_rect)
+
+    # Pressing the button
+    def clicking(self):
+        boolean = False
+        mouse = py.mouse.get_pos()
+        if mouse[0] in (self.x_pos, self.x_pos + self.width) and mouse[1] in (self.y_pos, self.y_pos + self.width):
+            boolean = True
+        return boolean
+
+    # Hovering over the button
+    def changeColor(self, hover_colour):
+        mouse = py.mouse.get_pos()
+        if self.x_pos < mouse[0] < self.x_pos + self.width and self.y_pos < mouse[1] < self.y_pos + self.height:
+            py.draw.rect(screen, hover_colour, (self.x_pos, self.y_pos, self.width, self.height))
+
+
+def main_menu():
+    py.display.set_caption("Main Menu: Welcome to Hotel Recommendations")
+    while True:
+        menu_text = font.render("HOTEL RECOMMENDATIONS", True, white)
+        menu_rect = menu_text.get_rect(center=(640, 150))
+        screen.blit(menu_text, menu_rect)
+        play_button = Button(540, 260, 200, 200, "START!", white)
+        play_button.update()
+        play_button.changeColor(red)
+        for event in py.event.get():
+            if event.type == py.QUIT:
+                py.quit()
+            if event.type == py.MOUSEBUTTONDOWN:
+                play()
+        py.display.update()
+
+
+def play():
+    py.display.set_caption("Booting...")
+    while True:
+        screen.fill(black)
+        play_text = font.render("This is the START SCREEN", True, white)
+        play_rect = play_text.get_rect(center=(640, 150))
+        screen.blit(play_text, play_rect)
+        return_to_menu = Button(540, 260, 200, 200, "Click to return to main menu!", green)
+        return_to_menu.update()
+        return_to_menu.changeColor(red)
+        for event in py.event.get():
+            if event.type == py.QUIT:
+                py.quit()
+            if event.type == py.MOUSEBUTTONDOWN:
+                if return_to_menu.clicking():
+                    main_menu()
+        py.display.update()
+
+main_menu()
