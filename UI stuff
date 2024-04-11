@@ -1,11 +1,12 @@
 import os
-import pygame as py
 import pandas as pd
+import pygame as py
 import numpy as np
+import sys
 
 # Data Processing
-df = pd.read_csv("C:\\Users\\Dylan\\Downloads\\Hotel Data sample.csv")
-df = df.set_index('Hotel name')
+#df = pd.read_csv("C:\\Users\\Dylan\\Downloads\\Hotel Data sample.csv")
+#df = df.set_index('Hotel name')
 
 # Calculating Distances
 
@@ -29,7 +30,6 @@ light_blue = (66, 179, 244)
 yellow = (191, 255, 0)
 font = py.font.Font(None, 36)
 
-
 class Button:
     def __init__(self, x_pos, y_pos, width, height, text_input, base_colour):
         self.x_pos = x_pos
@@ -48,49 +48,158 @@ class Button:
 
     # Pressing the button
     def clicking(self):
-        boolean = False
         mouse = py.mouse.get_pos()
-        if mouse[0] in (self.x_pos, self.x_pos + self.width) and mouse[1] in (self.y_pos, self.y_pos + self.width):
-            boolean = True
-        return boolean
+        if self.x_pos < mouse[0] < self.x_pos + self.width and self.y_pos < mouse[1] < self.y_pos + self.height:
+            return True
+        return False
 
     # Hovering over the button
     def changeColor(self, hover_colour):
         mouse = py.mouse.get_pos()
         if self.x_pos < mouse[0] < self.x_pos + self.width and self.y_pos < mouse[1] < self.y_pos + self.height:
             py.draw.rect(screen, hover_colour, (self.x_pos, self.y_pos, self.width, self.height))
+            screen.blit(self.text, self.text_rect)
 
+
+class ToggleButtons:
+    def __init__(self, text, x_pos, y_pos, width, height, enabled):
+        self.text = text
+        self.x_pos = x_pos
+        self.y_pos = y_pos
+        self.width = width
+        self.height = height
+        self.enabled = enabled
+        self.draw()
+
+    def draw(self):
+        button_text = font.render(self.text, True, white)
+        button_text_rect = button_text.get_rect(center = (self.x_pos + self.width/2, self.y_pos + self.height/2))
+        button_rect = py.rect.Rect((self.x_pos, self.y_pos), (self.width, self.height))
+        if self.enabled:
+            py.draw.rect(screen, maroon, button_rect)
+        else:
+            py.draw.rect(screen, yellow, button_rect)
+        screen.blit(button_text, button_text_rect)
+
+    def click(self):
+        mouse = py.mouse.get_pos()
+        left_click = py.mouse.get_pressed()[0]
+        button_rect = py.rect.Rect((self.x_pos, self.y_pos), (self.width, self.height))
+        if left_click and button_rect.collidepoint(mouse):
+            return True
+        else:
+            return False
+        
+class text_field:
 
 def main_menu():
     py.display.set_caption("Main Menu: Welcome to Hotel Recommendations")
     while True:
+        screen.fill(black)
         menu_text = font.render("HOTEL RECOMMENDATIONS", True, white)
-        menu_rect = menu_text.get_rect(center=(640, 150))
+        menu_rect = menu_text.get_rect(center=(screen_w/2, screen_h/5))
         screen.blit(menu_text, menu_rect)
-        play_button = Button(540, 260, 200, 200, "START!", white)
+        play_button = Button(screen_w/2 - 150 , screen_h/2 - 150, 300, 300, "START!", green)
         play_button.update()
         play_button.changeColor(red)
         for event in py.event.get():
             if event.type == py.QUIT:
                 py.quit()
+                sys.exit()
             if event.type == py.MOUSEBUTTONDOWN:
-                play()
+                if play_button.clicking():
+                    play()
         py.display.update()
 
 
 def play():
     py.display.set_caption("Booting...")
+    dtc_enable, price_enable, rating_enable = False, False, False
+    dtc_new_press, price_new_press, rating_new_press = True, True, True
     while True:
         screen.fill(black)
-        play_text = font.render("This is the START SCREEN", True, white)
-        play_rect = play_text.get_rect(center=(640, 150))
+        play_text = font.render("START SCREEN", True, white)
+        play_rect = play_text.get_rect(center=(screen_w/2, screen_h/5))
         screen.blit(play_text, play_rect)
-        return_to_menu = Button(540, 260, 200, 200, "Click to return to main menu!", green)
+        question_text = font.render("What would you like?", True, white)
+        question_rect = question_text.get_rect(center=(screen_w / 2, screen_h / 5 + 50))
+        screen.blit(question_text, question_rect)
+        return_to_menu = Button(0, 0, 200, 200, "Main Menu!", green)
         return_to_menu.update()
-        return_to_menu.changeColor(red)
+        return_to_menu.changeColor(blue)
+
+        sort_dtc = ToggleButtons("Sort by Distance to City", screen_w/3 - 300, screen_h/3, 300, 200, dtc_enable)
+        if py.mouse.get_pressed()[0] and dtc_new_press:
+            dtc_new_press = False
+            if sort_dtc.click():
+                if dtc_enable:
+                    dtc_enable = False
+                else:
+                    dtc_enable = True
+                    price_enable = False
+                    rating_enable = False
+        if not py.mouse.get_pressed()[0] and not dtc_new_press:
+            dtc_new_press = True
+
+        sort_price = ToggleButtons("Sort by Price", screen_w / 2 - 150, screen_h / 3, 300, 200, price_enable)
+        if py.mouse.get_pressed()[0] and price_new_press:
+            price_new_press = False
+            if sort_price.click():
+                if price_enable:
+                    price_enable = False
+                else:
+                    price_enable = True
+                    rating_enable = False
+                    dtc_enable = False
+        if not py.mouse.get_pressed()[0] and not price_new_press:
+            price_new_press = True
+
+        sort_rating = ToggleButtons("Sort by Rating", 2 * screen_w / 3 , screen_h / 3, 300, 200, rating_enable)
+        if py.mouse.get_pressed()[0] and rating_new_press:
+            rating_new_press = False
+            if sort_rating.click():
+                if rating_enable:
+                    rating_enable = False
+                else:
+                    rating_enable = True
+                    price_enable = False
+                    dtc_enable = False
+        if not py.mouse.get_pressed()[0] and not rating_new_press:
+            rating_new_press = True
+
+        minP_text = font.render("Minimum Price Per Night: ", True, white)
+        minP_rect = minP_text.get_rect(center=(screen_w/3, 2 * screen_h/3 - 50))
+        screen.blit(minP_text, minP_rect)
+        minP_input_rect = (screen_w/3 + minP_rect.w/2, 2 * screen_h/3 - 50 - minP_rect.h/2, 50, 32)
+        minP_active = False
+
+        maxP_text = font.render("Maximum Price Per Night: ", True, white)
+        maxP_rect = maxP_text.get_rect(center=(2 * screen_w /3, 2 * screen_h / 3 - 50))
+        screen.blit(maxP_text, maxP_rect)
+        maxP_input_rect = (2 * screen_w / 3 + maxP_rect.w / 2, 2 * screen_h / 3 - 50 - maxP_rect.h / 2, 50, 32)
+        maxP_active = False
+
+        minR_text = font.render("Minimum Rating: ", True, white)
+        minR_rect = minR_text.get_rect(center=(screen_w / 3, 2 * screen_h / 3))
+        screen.blit(minR_text, minR_rect)
+        minR_input_rect = (screen_w / 3 + minR_rect.w / 2, 2 * screen_h / 3 - minR_rect.h / 2, 50, 32)
+        minR_active = False
+
+        maxR_text = font.render("Maximum Rating: ", True, white)
+        maxR_rect = maxR_text.get_rect(center=(2 * screen_w / 3, 2 * screen_h / 3))
+        screen.blit(maxR_text, maxR_rect)
+        maxR_input_rect = (2 * screen_w / 3 + maxR_rect.w / 2, 2 * screen_h / 3 - maxR_rect.h / 2, 50, 32)
+        maxR_active = False
+
+        py.draw.rect(screen, white, minP_input_rect, 2)
+        py.draw.rect(screen, white, maxP_input_rect, 2)
+        py.draw.rect(screen, white, minR_input_rect, 2)
+        py.draw.rect(screen, white, maxR_input_rect, 2)
+
         for event in py.event.get():
             if event.type == py.QUIT:
                 py.quit()
+                sys.exit()
             if event.type == py.MOUSEBUTTONDOWN:
                 if return_to_menu.clicking():
                     main_menu()
