@@ -89,8 +89,6 @@ class ToggleButtons:
             return True
         else:
             return False
-        
-class text_field:
 
 def main_menu():
     py.display.set_caption("Main Menu: Welcome to Hotel Recommendations")
@@ -116,6 +114,9 @@ def play():
     py.display.set_caption("Booting...")
     dtc_enable, price_enable, rating_enable = False, False, False
     dtc_new_press, price_new_press, rating_new_press = True, True, True
+    minP_active, maxP_active, minR_active, maxR_active = False, False, False, False
+    minP_press, maxP_press, minR_press, maxR_press = True, True, True, True
+    minP_input, maxP_input, minR_input, maxR_input = '', '', '', ''
     while True:
         screen.fill(black)
         play_text = font.render("START SCREEN", True, white)
@@ -170,28 +171,55 @@ def play():
         minP_text = font.render("Minimum Price Per Night: ", True, white)
         minP_rect = minP_text.get_rect(center=(screen_w/3, 2 * screen_h/3 - 50))
         screen.blit(minP_text, minP_rect)
-        minP_input_rect = (screen_w/3 + minP_rect.w/2, 2 * screen_h/3 - 50 - minP_rect.h/2, 50, 32)
-        minP_active = False
+        minP_input_rect = py.Rect(screen_w/3 + minP_rect.w/2, 2 * screen_h/3 - 50 - minP_rect.h/2, 50, 32)
+
+        if py.mouse.get_pressed()[0] and minP_press:
+            minP_press = False
+            if minP_input_rect.collidepoint(py.mouse.get_pos()):
+                if not minP_active:
+                    minP_active = True
+                    maxP_active = False
+                    minR_active = False
+                    maxR_active = False
+                else:
+                    minP_active = False
+        if not py.mouse.get_pressed()[0] and not minP_press:
+            minP_press = True
+        if minP_active:
+            py.draw.rect(screen, light_green, minP_input_rect, 2)
+            for event in py.event.get():
+                if event.type == py.QUIT:
+                    py.quit()
+                    sys.exit()
+                if event.type == py.KEYDOWN:
+                    if event.key == py.K_BACKSPACE:
+                        minP_input = minP_input[:-1]
+                    else:
+                        minP_input += event.unicode
+        else:
+            py.draw.rect(screen, white, minP_input_rect, 2)
+        minP_surf = font.render(minP_input, True, white)
+        screen.blit(minP_surf, minP_input_rect)
 
         maxP_text = font.render("Maximum Price Per Night: ", True, white)
         maxP_rect = maxP_text.get_rect(center=(2 * screen_w /3, 2 * screen_h / 3 - 50))
         screen.blit(maxP_text, maxP_rect)
-        maxP_input_rect = (2 * screen_w / 3 + maxP_rect.w / 2, 2 * screen_h / 3 - 50 - maxP_rect.h / 2, 50, 32)
+        maxP_input_rect = py.Rect(2 * screen_w / 3 + maxP_rect.w / 2, 2 * screen_h / 3 - 50 - maxP_rect.h / 2, 50, 32)
         maxP_active = False
 
         minR_text = font.render("Minimum Rating: ", True, white)
         minR_rect = minR_text.get_rect(center=(screen_w / 3, 2 * screen_h / 3))
         screen.blit(minR_text, minR_rect)
-        minR_input_rect = (screen_w / 3 + minR_rect.w / 2, 2 * screen_h / 3 - minR_rect.h / 2, 50, 32)
+        minR_input_rect = py.Rect(screen_w / 3 + minR_rect.w / 2, 2 * screen_h / 3 - minR_rect.h / 2, 50, 32)
         minR_active = False
 
         maxR_text = font.render("Maximum Rating: ", True, white)
         maxR_rect = maxR_text.get_rect(center=(2 * screen_w / 3, 2 * screen_h / 3))
         screen.blit(maxR_text, maxR_rect)
-        maxR_input_rect = (2 * screen_w / 3 + maxR_rect.w / 2, 2 * screen_h / 3 - maxR_rect.h / 2, 50, 32)
+        maxR_input_rect = py.Rect(2 * screen_w / 3 + maxR_rect.w / 2, 2 * screen_h / 3 - maxR_rect.h / 2, 50, 32)
         maxR_active = False
 
-        py.draw.rect(screen, white, minP_input_rect, 2)
+
         py.draw.rect(screen, white, maxP_input_rect, 2)
         py.draw.rect(screen, white, minR_input_rect, 2)
         py.draw.rect(screen, white, maxR_input_rect, 2)
