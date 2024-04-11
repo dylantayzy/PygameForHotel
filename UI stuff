@@ -114,22 +114,27 @@ def play():
     py.display.set_caption("Booting...")
     dtc_enable, price_enable, rating_enable = False, False, False
     dtc_new_press, price_new_press, rating_new_press = True, True, True
+
     minP_active, maxP_active, minR_active, maxR_active = False, False, False, False
     minP_press, maxP_press, minR_press, maxR_press = True, True, True, True
     minP_input, maxP_input, minR_input, maxR_input = '', '', '', ''
+
+    pool_enable, gym_enable, restaurant_enable, bar_enable = False, False, False, False
+    pool_new_press, gym_new_press, restaurant_new_press, bar_new_press = True, True, True, True
+
     while True:
         screen.fill(black)
         play_text = font.render("START SCREEN", True, white)
-        play_rect = play_text.get_rect(center=(screen_w/2, screen_h/5))
+        play_rect = play_text.get_rect(center=(screen_w/2, screen_h/10))
         screen.blit(play_text, play_rect)
         question_text = font.render("What would you like?", True, white)
-        question_rect = question_text.get_rect(center=(screen_w / 2, screen_h / 5 + 50))
+        question_rect = question_text.get_rect(center=(screen_w / 2, screen_h / 10 + 50))
         screen.blit(question_text, question_rect)
         return_to_menu = Button(0, 0, 200, 200, "Main Menu!", green)
         return_to_menu.update()
         return_to_menu.changeColor(blue)
 
-        sort_dtc = ToggleButtons("Sort by Distance to City", screen_w/3 - 300, screen_h/3, 300, 200, dtc_enable)
+        sort_dtc = ToggleButtons("Sort by Distance to City", screen_w/3 - 300, screen_h/5, 300, 200, dtc_enable)
         if py.mouse.get_pressed()[0] and dtc_new_press:
             dtc_new_press = False
             if sort_dtc.click():
@@ -142,7 +147,7 @@ def play():
         if not py.mouse.get_pressed()[0] and not dtc_new_press:
             dtc_new_press = True
 
-        sort_price = ToggleButtons("Sort by Price", screen_w / 2 - 150, screen_h / 3, 300, 200, price_enable)
+        sort_price = ToggleButtons("Sort by Price", screen_w / 2 - 150, screen_h / 5, 300, 200, price_enable)
         if py.mouse.get_pressed()[0] and price_new_press:
             price_new_press = False
             if sort_price.click():
@@ -155,7 +160,7 @@ def play():
         if not py.mouse.get_pressed()[0] and not price_new_press:
             price_new_press = True
 
-        sort_rating = ToggleButtons("Sort by Rating", 2 * screen_w / 3 , screen_h / 3, 300, 200, rating_enable)
+        sort_rating = ToggleButtons("Sort by Rating", 2 * screen_w / 3 , screen_h / 5, 300, 200, rating_enable)
         if py.mouse.get_pressed()[0] and rating_new_press:
             rating_new_press = False
             if sort_rating.click():
@@ -169,10 +174,9 @@ def play():
             rating_new_press = True
 
         minP_text = font.render("Minimum Price Per Night: ", True, white)
-        minP_rect = minP_text.get_rect(center=(screen_w/3, 2 * screen_h/3 - 50))
+        minP_rect = minP_text.get_rect(center=(screen_w/3, 2 * screen_h/4 - 50))
         screen.blit(minP_text, minP_rect)
-        minP_input_rect = py.Rect(screen_w/3 + minP_rect.w/2, 2 * screen_h/3 - 50 - minP_rect.h/2, 50, 32)
-
+        minP_input_rect = py.Rect(screen_w/3 + minP_rect.w/2, screen_h/2 - 50 - minP_rect.h/2, 70, 32)
         if py.mouse.get_pressed()[0] and minP_press:
             minP_press = False
             if minP_input_rect.collidepoint(py.mouse.get_pos()):
@@ -183,46 +187,152 @@ def play():
                     maxR_active = False
                 else:
                     minP_active = False
+            else:
+                minP_active = False
         if not py.mouse.get_pressed()[0] and not minP_press:
             minP_press = True
         if minP_active:
-            py.draw.rect(screen, light_green, minP_input_rect, 2)
+            colour = light_green
             for event in py.event.get():
                 if event.type == py.QUIT:
                     py.quit()
                     sys.exit()
                 if event.type == py.KEYDOWN:
+                    if event.key == py.K_RETURN:
+                        minP_active = False
+                        print(minP_input)
                     if event.key == py.K_BACKSPACE:
                         minP_input = minP_input[:-1]
                     else:
                         minP_input += event.unicode
         else:
-            py.draw.rect(screen, white, minP_input_rect, 2)
+            colour = white
         minP_surf = font.render(minP_input, True, white)
-        screen.blit(minP_surf, minP_input_rect)
+        minP_input_rect.w = minP_surf.get_width() + 10
+        py.draw.rect(screen, colour, minP_input_rect, 2)
+        screen.blit(minP_surf, (minP_input_rect.x + 5, minP_input_rect.y + 5))
 
         maxP_text = font.render("Maximum Price Per Night: ", True, white)
-        maxP_rect = maxP_text.get_rect(center=(2 * screen_w /3, 2 * screen_h / 3 - 50))
+        maxP_rect = maxP_text.get_rect(center=(2 * screen_w /3,  screen_h / 2 - 50))
         screen.blit(maxP_text, maxP_rect)
-        maxP_input_rect = py.Rect(2 * screen_w / 3 + maxP_rect.w / 2, 2 * screen_h / 3 - 50 - maxP_rect.h / 2, 50, 32)
-        maxP_active = False
+        maxP_input_rect = py.Rect(2 * screen_w / 3 + maxP_rect.w / 2, screen_h / 2 - 50 - maxP_rect.h / 2, 70, 32)
+        if py.mouse.get_pressed()[0] and maxP_press:
+            maxP_press = False
+            if maxP_input_rect.collidepoint(py.mouse.get_pos()):
+                if not maxP_active:
+                    minP_active = False
+                    maxP_active = True
+                    minR_active = False
+                    maxR_active = False
+                else:
+                    maxP_active = False
+            else:
+                maxP_active = False
+        if not py.mouse.get_pressed()[0] and not maxP_press:
+            maxP_press = True
+        if maxP_active:
+            colour = light_green
+            for event in py.event.get():
+                if event.type == py.QUIT:
+                    py.quit()
+                    sys.exit()
+                if event.type == py.KEYDOWN:
+                    print("Active")
+                    if event.key == py.K_RETURN:
+                        maxP_active = False
+                        print(maxP_input)
+                    if event.key == py.K_BACKSPACE:
+                        maxP_input = maxP_input[:-1]
+                    else:
+                        maxP_input += event.unicode
+        else:
+            colour = white
+        maxP_surf = font.render(maxP_input, True, white)
+        maxP_input_rect.w = maxP_surf.get_width() + 10
+        py.draw.rect(screen, colour, maxP_input_rect, 2)
+        screen.blit(maxP_surf, (maxP_input_rect.x + 5, maxP_input_rect.y + 5))
 
         minR_text = font.render("Minimum Rating: ", True, white)
-        minR_rect = minR_text.get_rect(center=(screen_w / 3, 2 * screen_h / 3))
+        minR_rect = minR_text.get_rect(center=(screen_w / 3, screen_h / 2 + screen_h/120))
         screen.blit(minR_text, minR_rect)
-        minR_input_rect = py.Rect(screen_w / 3 + minR_rect.w / 2, 2 * screen_h / 3 - minR_rect.h / 2, 50, 32)
-        minR_active = False
+        minR_input_rect = py.Rect(screen_w / 3 + minR_rect.w / 2, screen_h / 2 - minR_rect.h / 2 + screen_h/120, 50, 32)
+        if py.mouse.get_pressed()[0] and minR_press:
+            minR_press = False
+            if minR_input_rect.collidepoint(py.mouse.get_pos()):
+                if not minR_active:
+                    minP_active = False
+                    maxP_active = False
+                    minR_active = True
+                    maxR_active = False
+                else:
+                    minR_active = False
+            else:
+                minR_active = False
+        if not py.mouse.get_pressed()[0] and not minR_press:
+            minR_press = True
+        if minR_active:
+            colour = light_green
+            for event in py.event.get():
+                if event.type == py.QUIT:
+                    py.quit()
+                    sys.exit()
+                if event.type == py.KEYDOWN:
+                    print("Active")
+                    if event.key == py.K_RETURN:
+                        minR_active = False
+                        print(minR_input)
+                    if event.key == py.K_BACKSPACE:
+                        minR_input = minR_input[:-1]
+                    else:
+                        minR_input += event.unicode
+        else:
+            colour = white
+        minR_surf = font.render(minR_input, True, white)
+        minR_input_rect.w = minR_surf.get_width() + 10
+        py.draw.rect(screen, colour, minR_input_rect, 2)
+        screen.blit(minR_surf, (minR_input_rect.x + 5, minR_input_rect.y + 5))
 
         maxR_text = font.render("Maximum Rating: ", True, white)
-        maxR_rect = maxR_text.get_rect(center=(2 * screen_w / 3, 2 * screen_h / 3))
+        maxR_rect = maxR_text.get_rect(center=(2 * screen_w / 3, screen_h / 2 + screen_h/120))
         screen.blit(maxR_text, maxR_rect)
-        maxR_input_rect = py.Rect(2 * screen_w / 3 + maxR_rect.w / 2, 2 * screen_h / 3 - maxR_rect.h / 2, 50, 32)
-        maxR_active = False
+        maxR_input_rect = py.Rect(2 * screen_w / 3 + maxR_rect.w / 2, screen_h / 2 - maxR_rect.h / 2 + screen_h/120, 50, 32)
+        if py.mouse.get_pressed()[0] and maxR_press:
+            maxR_press = False
+            if maxR_input_rect.collidepoint(py.mouse.get_pos()):
+                if not maxR_active:
+                    minP_active = False
+                    maxP_active = False
+                    minR_active = False
+                    maxR_active = True
+                else:
+                    maxR_active = False
+            else:
+                maxR_active = False
+        if not py.mouse.get_pressed()[0] and not maxR_press:
+            maxR_press = True
+        if maxR_active:
+            colour = light_green
+            for event in py.event.get():
+                if event.type == py.QUIT:
+                    py.quit()
+                    sys.exit()
+                if event.type == py.KEYDOWN:
+                    print("Active")
+                    if event.key == py.K_RETURN:
+                        maxR_active = False
+                        print(maxR_input)
+                    if event.key == py.K_BACKSPACE:
+                        maxR_input = maxR_input[:-1]
+                    else:
+                        maxR_input += event.unicode
+        else:
+            colour = white
+        maxR_surf = font.render(maxR_input, True, white)
+        maxR_input_rect.w = maxR_surf.get_width() + 10
+        py.draw.rect(screen, colour, maxR_input_rect, 2)
+        screen.blit(maxR_surf, (maxR_input_rect.x + 5, maxR_input_rect.y + 5))
 
-
-        py.draw.rect(screen, white, maxP_input_rect, 2)
-        py.draw.rect(screen, white, minR_input_rect, 2)
-        py.draw.rect(screen, white, maxR_input_rect, 2)
+        pool_button = ToggleButtons("Pool", screen_w/4 - 100, 3 * screen_h/5 - 50, 200, 100, pool_enable)
 
         for event in py.event.get():
             if event.type == py.QUIT:
@@ -231,6 +341,24 @@ def play():
             if event.type == py.MOUSEBUTTONDOWN:
                 if return_to_menu.clicking():
                     main_menu()
+        py.display.update()
+
+def fail():
+    py.display.set_caption("FAIL")
+    while True:
+        screen.fill(black)
+        fail_text = font.render("YOU'VE INPUTTED WRONGLY" , True, white)
+        fail_rect = fail_text.get_rect(center=(screen_w/2, 200))
+        screen.blit(fail_text, fail_rect)
+        return_to_play = Button(screen_w/2 - 250, screen_h/2 - 100, 500, 200, "Would you like to return to the selection?", green)
+        return_to_play.update()
+        return_to_play.changeColor(light_blue)
+        for event in py.event.get():
+            if event.type == py.QUIT:
+                py.quit()
+            if event.type == py.MOUSEBUTTONDOWN:
+                if return_to_play.clicking():
+                    play()
         py.display.update()
 
 main_menu()
