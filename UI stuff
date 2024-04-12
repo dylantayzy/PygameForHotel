@@ -174,9 +174,9 @@ def play():
             rating_new_press = True
 
         minP_text = font.render("Minimum Price Per Night: ", True, white)
-        minP_rect = minP_text.get_rect(center=(screen_w/3, 2 * screen_h/4 - 50))
+        minP_rect = minP_text.get_rect(center=(screen_w/3, screen_h/2 - screen_h/30))
         screen.blit(minP_text, minP_rect)
-        minP_input_rect = py.Rect(screen_w/3 + minP_rect.w/2, screen_h/2 - 50 - minP_rect.h/2, 70, 32)
+        minP_input_rect = py.Rect(screen_w/3 + minP_rect.w/2, screen_h/2 - screen_h/30 - minP_rect.h/2, 70, 32)
         if py.mouse.get_pressed()[0] and minP_press:
             minP_press = False
             if minP_input_rect.collidepoint(py.mouse.get_pos()):
@@ -213,9 +213,9 @@ def play():
         screen.blit(minP_surf, (minP_input_rect.x + 5, minP_input_rect.y + 5))
 
         maxP_text = font.render("Maximum Price Per Night: ", True, white)
-        maxP_rect = maxP_text.get_rect(center=(2 * screen_w /3,  screen_h / 2 - 50))
+        maxP_rect = maxP_text.get_rect(center=(2 * screen_w /3,  screen_h / 2 - screen_h/30))
         screen.blit(maxP_text, maxP_rect)
-        maxP_input_rect = py.Rect(2 * screen_w / 3 + maxP_rect.w / 2, screen_h / 2 - 50 - maxP_rect.h / 2, 70, 32)
+        maxP_input_rect = py.Rect(2 * screen_w / 3 + maxP_rect.w / 2, screen_h / 2 - screen_h/30 - maxP_rect.h / 2, 70, 32)
         if py.mouse.get_pressed()[0] and maxP_press:
             maxP_press = False
             if maxP_input_rect.collidepoint(py.mouse.get_pos()):
@@ -253,9 +253,9 @@ def play():
         screen.blit(maxP_surf, (maxP_input_rect.x + 5, maxP_input_rect.y + 5))
 
         minR_text = font.render("Minimum Rating: ", True, white)
-        minR_rect = minR_text.get_rect(center=(screen_w / 3, screen_h / 2 + screen_h/120))
+        minR_rect = minR_text.get_rect(center=(screen_w / 3, screen_h / 2 + screen_h/100))
         screen.blit(minR_text, minR_rect)
-        minR_input_rect = py.Rect(screen_w / 3 + minR_rect.w / 2, screen_h / 2 - minR_rect.h / 2 + screen_h/120, 50, 32)
+        minR_input_rect = py.Rect(screen_w / 3 + minR_rect.w / 2, screen_h / 2 - minR_rect.h / 2 + screen_h/100, 50, 32)
         if py.mouse.get_pressed()[0] and minR_press:
             minR_press = False
             if minR_input_rect.collidepoint(py.mouse.get_pos()):
@@ -293,9 +293,9 @@ def play():
         screen.blit(minR_surf, (minR_input_rect.x + 5, minR_input_rect.y + 5))
 
         maxR_text = font.render("Maximum Rating: ", True, white)
-        maxR_rect = maxR_text.get_rect(center=(2 * screen_w / 3, screen_h / 2 + screen_h/120))
+        maxR_rect = maxR_text.get_rect(center=(2 * screen_w / 3, screen_h / 2 + screen_h/100))
         screen.blit(maxR_text, maxR_rect)
-        maxR_input_rect = py.Rect(2 * screen_w / 3 + maxR_rect.w / 2, screen_h / 2 - maxR_rect.h / 2 + screen_h/120, 50, 32)
+        maxR_input_rect = py.Rect(2 * screen_w / 3 + maxR_rect.w / 2, screen_h / 2 - maxR_rect.h / 2 + screen_h/100, 50, 32)
         if py.mouse.get_pressed()[0] and maxR_press:
             maxR_press = False
             if maxR_input_rect.collidepoint(py.mouse.get_pos()):
@@ -317,7 +317,6 @@ def play():
                     py.quit()
                     sys.exit()
                 if event.type == py.KEYDOWN:
-                    print("Active")
                     if event.key == py.K_RETURN:
                         maxR_active = False
                         print(maxR_input)
@@ -332,7 +331,27 @@ def play():
         py.draw.rect(screen, colour, maxR_input_rect, 2)
         screen.blit(maxR_surf, (maxR_input_rect.x + 5, maxR_input_rect.y + 5))
 
-        pool_button = ToggleButtons("Pool", screen_w/4 - 100, 3 * screen_h/5 - 50, 200, 100, pool_enable)
+        pool_button = ToggleButtons("Pool",  screen_w/5 - 100, 3 * screen_h/5 - 50, 200, 100, pool_enable)
+        if py.mouse.get_pressed()[0] and pool_new_press:
+            pool_new_press = False
+            if pool_button.click():
+                if pool_enable:
+                    pool_enable = False
+                else:
+                    pool_enable = True
+        if not py.mouse.get_pressed()[0] and not pool_new_press:
+            pool_new_press = True
+
+        restaurant_button = ToggleButtons("Restaurant", 2 * screen_w / 5 - 100, 3 * screen_h / 5 - 50, 200, 100, restaurant_enable)
+        if py.mouse.get_pressed()[0] and restaurant_new_press:
+            restaurant_new_press = False
+            if restaurant_button.click():
+                if restaurant_enable:
+                    restaurant_enable = False
+                else:
+                    restaurant_enable = True
+        if not py.mouse.get_pressed()[0] and not restaurant_new_press:
+            restaurant_new_press = True
 
         for event in py.event.get():
             if event.type == py.QUIT:
