@@ -2,20 +2,18 @@ import os
 import pygame as py
 import sys
 
-# Data Processing
-df = pd.read_csv("C:\\Users\\Dylan\\Downloads\\CV3_Group1_Hotel recommendation database - Sheet1.csv")
-df = df.set_index('Hotel')
-
-# Calculating Distances
-
-# Sorting
-
 # UI
 os.environ['SDL_VIDEO_CENTERED'] = '1'
+
+# Starts game
 py.init()
+
+# getting screen dimensions to use for scaling buttons
 info = py.display.Info()
 screen_w, screen_h = info.current_w, info.current_h
 screen = py.display.set_mode((screen_w, screen_h - 60))
+
+# Captions + colours + generic font used throughout
 py.display.set_caption("Hotel Recommendations")
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -28,27 +26,27 @@ light_blue = (66, 179, 244)
 yellow = (191, 255, 0)
 font = py.font.Font(None, 36)
 
-
+# Creating a class for buttons
 class Button:
     def __init__(self, x_pos, y_pos, width, height, text_input, base_colour):
-        self.x_pos = x_pos
-        self.y_pos = y_pos
-        self.width = width
-        self.height = height
-        self.text_input = text_input
-        self.text = font.render(text_input, True, white)
-        self.text_rect = self.text.get_rect(center=(x_pos + width / 2, y_pos + height / 2))
-        self.base_colour = base_colour
+        self.x_pos = x_pos # x position of top right corner of button
+        self.y_pos = y_pos # y position of top right corner of button
+        self.width = width # width of button
+        self.height = height # height of button
+        self.text_input = text_input # text in middle of button
+        self.text = font.render(text_input, True, white) # rendering the text
+        self.text_rect = self.text.get_rect(center=(x_pos + width / 2, y_pos + height / 2)) # rendering the rectangle
+        self.base_colour = base_colour # colour of button
 
     # Generating the text and the rectangle for the button
     def update(self):
-        py.draw.rect(screen, self.base_colour, (self.x_pos, self.y_pos, self.width, self.height))
-        screen.blit(self.text, self.text_rect)
+        py.draw.rect(screen, self.base_colour, (self.x_pos, self.y_pos, self.width, self.height)) # asking pygame to draw rectangle
+        screen.blit(self.text, self.text_rect) # blit text onto screen
 
     # Pressing the button
     def clicking(self):
-        mouse = py.mouse.get_pos()
-        if self.x_pos < mouse[0] < self.x_pos + self.width and self.y_pos < mouse[1] < self.y_pos + self.height:
+        mouse = py.mouse.get_pos() # To get position of mouse
+        if self.x_pos < mouse[0] < self.x_pos + self.width and self.y_pos < mouse[1] < self.y_pos + self.height: # check if mouse is in rectangle
             return True
         return False
 
@@ -56,10 +54,10 @@ class Button:
     def changeColor(self, hover_colour):
         mouse = py.mouse.get_pos()
         if self.x_pos < mouse[0] < self.x_pos + self.width and self.y_pos < mouse[1] < self.y_pos + self.height:
-            py.draw.rect(screen, hover_colour, (self.x_pos, self.y_pos, self.width, self.height))
-            screen.blit(self.text, self.text_rect)
+            py.draw.rect(screen, hover_colour, (self.x_pos, self.y_pos, self.width, self.height)) # draws ontop of original rectangle with hovering colour
+            screen.blit(self.text, self.text_rect) # since the original rectangle is being drawn over, text also must be rewritten
 
-
+# A separate class for buttons that toggle because they can enable/disable
 class ToggleButtons:
     def __init__(self, text, x_pos, y_pos, width, height, enabled):
         self.text = text
@@ -67,87 +65,105 @@ class ToggleButtons:
         self.y_pos = y_pos
         self.width = width
         self.height = height
-        self.enabled = enabled
+        self.enabled = enabled # enabled implies the button is toggled
         self.draw()
 
+    # to draw the button
     def draw(self):
         button_text = font.render(self.text, True, white)
         button_text_rect = button_text.get_rect(center=(self.x_pos + self.width / 2, self.y_pos + self.height / 2))
         button_rect = py.rect.Rect((self.x_pos, self.y_pos), (self.width, self.height))
+
+        # to change colour when toggled
         if self.enabled:
             py.draw.rect(screen, maroon, button_rect)
         else:
             py.draw.rect(screen, yellow, button_rect)
         screen.blit(button_text, button_text_rect)
 
+    # to click the button
     def click(self):
         mouse = py.mouse.get_pos()
-        left_click = py.mouse.get_pressed()[0]
+        left_click = py.mouse.get_pressed()[0] # when doing a left click
         button_rect = py.rect.Rect((self.x_pos, self.y_pos), (self.width, self.height))
-        if left_click and button_rect.collidepoint(mouse):
+        if left_click and button_rect.collidepoint(mouse): # collide point just checks if the mouse is within the rectangle
             return True
         else:
             return False
 
-
+# main screen
 def main_menu():
     py.display.set_caption("Main Menu: Welcome to Hotel Recommendations")
     while True:
-        screen.fill(black)
-        menu_text = font.render("HOTEL RECOMMENDATIONS", True, white)
-        menu_rect = menu_text.get_rect(center=(screen_w / 2, screen_h / 5))
-        screen.blit(menu_text, menu_rect)
-        play_button = Button(screen_w / 2 - 150, screen_h / 2 - 150, 300, 300, "START!", green)
-        play_button.update()
-        play_button.changeColor(red)
+        screen.fill(black) # clearing the screen to black
+        menu_text = font.render("HOTEL RECOMMENDATIONS", True, white) # processing the text on the screen
+        menu_rect = menu_text.get_rect(center=(screen_w / 2, screen_h / 5)) # position of text
+        screen.blit(menu_text, menu_rect) # generating the text on screen
+        play_button = Button(screen_w / 2 - 150, screen_h / 2 - 150, 300, 300, "START!", green) # creating my button to generate the play screen (later on)
+        play_button.update() # generating the button
+        play_button.changeColor(red) # setting my colour of hovering to red
         for event in py.event.get():
             if event.type == py.QUIT:
                 py.quit()
                 sys.exit()
-            if event.type == py.MOUSEBUTTONDOWN:
-                if play_button.clicking():
-                    play()
-        py.display.update()
+            if event.type == py.MOUSEBUTTONDOWN: 
+                if play_button.clicking(): # Basically checking if the button is being clicked each time left mouse click
+                    play() #if passed, the play screen will be generated
+        py.display.update() # updating the screen
 
-
+# play screen
+''' 
+Before starting this, just a short explanation on toggling buttons:
+We can't put the enable variable and new_press variable into the while True or else, the variable will remain as False or True with each iteration
+we do a loop every frame
+within the loop, the first if else loop is when both left click and new press is true and when both left click and new press is false
+in a frame where the mouse gets left clicked, since new_press was defined as true,
+new_press will be set to false first then there is a check if the mouse is on the button,
+if so the enable variable will change to True if previously false or vice versa,
+once enable changes => button changes colour
+once the next frame starts, left click is now false and since we set new_press to false,
+new_press becomes true waiting for left click to become true again
+cycle repeats creating a toggle
+'''
 def play():
     py.display.set_caption("Booting...")
-    dtc_enable, price_enable, rating_enable = False, False, False
-    dtc_new_press, price_new_press, rating_new_press = True, True, True
+    dtc_enable, price_enable, rating_enable = False, False, False # Used for toggling
+    dtc_new_press, price_new_press, rating_new_press = True, True, True # Used for toggling
 
-    minP_active, maxP_active, minR_active, maxR_active = False, False, False, False
-    minP_press, maxP_press, minR_press, maxR_press = True, True, True, True
-    minP_input, maxP_input, minR_input, maxR_input = '', '', '', ''
-
-    pool_enable, gym_enable, restaurant_enable, parking_enable = False, False, False, False
-    pool_new_press, gym_new_press, restaurant_new_press, parking_new_press = True, True, True, True
+    pool_enable, gym_enable, restaurant_enable, parking_enable = False, False, False, False # Used for toggling
+    pool_new_press, gym_new_press, restaurant_new_press, parking_new_press = True, True, True, True # Used for toggling
 
     while True:
-        screen.fill(black)
+        screen.fill(black) # resetting screen
+
+        #just multiple blits of text
         play_text = font.render("START SCREEN", True, white)
         play_rect = play_text.get_rect(center=(screen_w / 2, screen_h / 10))
         screen.blit(play_text, play_rect)
         question_text = font.render("What would you like?", True, white)
         question_rect = question_text.get_rect(center=(screen_w / 2, screen_h / 10 + 50))
         screen.blit(question_text, question_rect)
+
+        #generating a button to return to main menu
         return_to_menu = Button(0, 0, 200, 200, "Main Menu!", green)
         return_to_menu.update()
         return_to_menu.changeColor(blue)
 
-        sort_dtc = ToggleButtons("Sort by Distance to City", screen_w / 3 - 300, screen_h / 5, 300, 200, dtc_enable)
+        #making multiple toggle buttons for different sorting functions, refer to explanation above
+        sort_dtc = ToggleButtons("Sort by Distance to City", screen_w / 3 - 300, screen_h / 5, 300, 200, dtc_enable) #Sort by distance to city button
         if py.mouse.get_pressed()[0] and dtc_new_press:
             dtc_new_press = False
             if sort_dtc.click():
                 if dtc_enable:
                     dtc_enable = False
                 else:
-                    dtc_enable = True
+                    dtc_enable = True #one change is that I can only sort with one variable in play (distance to city, price or rating) so the other buttons must disable in the event where one button is enabled
                     price_enable = False
                     rating_enable = False
         if not py.mouse.get_pressed()[0] and not dtc_new_press:
             dtc_new_press = True
 
-        sort_price = ToggleButtons("Sort by Price", screen_w / 2 - 150, screen_h / 5, 300, 200, price_enable)
+        sort_price = ToggleButtons("Sort by Price", screen_w / 2 - 150, screen_h / 5, 300, 200, price_enable) #sort by price button
         if py.mouse.get_pressed()[0] and price_new_press:
             price_new_press = False
             if sort_price.click():
@@ -160,7 +176,7 @@ def play():
         if not py.mouse.get_pressed()[0] and not price_new_press:
             price_new_press = True
 
-        sort_rating = ToggleButtons("Sort by Rating", 2 * screen_w / 3, screen_h / 5, 300, 200, rating_enable)
+        sort_rating = ToggleButtons("Sort by Rating", 2 * screen_w / 3, screen_h / 5, 300, 200, rating_enable) #sort by rating button
         if py.mouse.get_pressed()[0] and rating_new_press:
             rating_new_press = False
             if sort_rating.click():
@@ -173,6 +189,7 @@ def play():
         if not py.mouse.get_pressed()[0] and not rating_new_press:
             rating_new_press = True
 
+        #Toggling for amenities the user wants in the hotel
         pool_button = ToggleButtons("Pool", screen_w / 5 - 100, 3 * screen_h / 5 - 50, 200, 100, pool_enable)
         if py.mouse.get_pressed()[0] and pool_new_press:
             pool_new_press = False
@@ -220,6 +237,7 @@ def play():
         if not py.mouse.get_pressed()[0] and not parking_new_press:
             parking_new_press = True
 
+        #creating the button to generate the recommendations
         generate_button = Button(screen_w / 2 - 200, 4 * screen_h / 5 - 50, 400, 100, "GET YOUR RECOMMENDATIONS!", blue)
         generate_button.update()
         generate_button.changeColor(light_blue)
@@ -229,16 +247,15 @@ def play():
                 py.quit()
                 sys.exit()
             if event.type == py.MOUSEBUTTONDOWN:
-                if return_to_menu.clicking():
-                    main_menu()
+                if return_to_menu.clicking(): #check if button to return to menu is being clicked
+                    main_menu() # brings to main menu
                 if generate_button.clicking():
-
-                    sort_list = [dtc_enable, price_enable, rating_enable]
+                    sort_list = [dtc_enable, price_enable, rating_enable] #storing list of active buttons to generate the page
                     amenities_list = [pool_enable, restaurant_enable, gym_enable, parking_enable]
                     generate(sort_list, amenities_list)
-        py.display.update()
+        py.display.update() #updating display
 
-
+# incomplete generate screen
 def generate(sort_list, amenities_list):
     py.display.set_caption("YOUR RECOMMENDATIONS BY YOURS TRULY")
     while True:
@@ -257,26 +274,6 @@ def generate(sort_list, amenities_list):
             if event.type == py.MOUSEBUTTONDOWN:
                 if return_to_menu.clicking():
                     main_menu()
-                if return_to_play.clicking():
-                    play()
-        py.display.update()
-
-
-def fail():
-    py.display.set_caption("FAIL")
-    while True:
-        screen.fill(black)
-        fail_text = font.render("YOU'VE INPUTTED WRONGLY", True, white)
-        fail_rect = fail_text.get_rect(center=(screen_w / 2, 200))
-        screen.blit(fail_text, fail_rect)
-        return_to_play = Button(screen_w / 2 - 250, screen_h / 2 - 100, 500, 200,
-                                "Would you like to return to the selection?", green)
-        return_to_play.update()
-        return_to_play.changeColor(light_blue)
-        for event in py.event.get():
-            if event.type == py.QUIT:
-                py.quit()
-            if event.type == py.MOUSEBUTTONDOWN:
                 if return_to_play.clicking():
                     play()
         py.display.update()
