@@ -25,7 +25,7 @@ light_blue = (66, 179, 244)
 yellow = (191, 255, 0)
 font = py.font.Font(None, 36)
 
-# Creating a class for buttons
+# Creating a class for buttons (class creates new obj and parameters for obj, init > intitial state > print all var in it, self is calling itself)
 class Button:
     def __init__(self, x_pos, y_pos, width, height, text_input, base_colour):
         self.x_pos = x_pos # x position of top right corner of button
@@ -95,8 +95,8 @@ def main_menu():
     py.display.set_caption("Main Menu: Welcome to Hotel Recommendations")
     while True:
         screen.fill(black) # clearing the screen to black
-        menu_text = font.render("HOTEL RECOMMENDATIONS", True, white) # processing the text on the screen
-        menu_rect = menu_text.get_rect(center=(screen_w / 2, screen_h / 5)) # position of text
+        menu_text = font.render("HOTEL RECOMMENDATIONS", True, white) # store text info in var
+        menu_rect = menu_text.get_rect(center=(screen_w / 2, screen_h / 5)) # position of text placed (set rect whr text is in)
         screen.blit(menu_text, menu_rect) # generating the text on screen
         play_button = Button(screen_w / 2 - 150, screen_h / 2 - 150, 300, 300, "START!", green) # creating my button to generate the play screen (later on)
         play_button.update() # generating the button
